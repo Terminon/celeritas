@@ -1,7 +1,6 @@
 package celeritas
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -21,9 +20,10 @@ func (c *Celeritas) CreateFileIfNotExists(path string) error {
 	if os.IsNotExist(err) {
 		file, err := os.Create(path)
 		if err != nil {
+			file.Close()
 			return err
 		}
-		fmt.Println(file)
+		defer file.Close()
 	}
 
 	return nil
