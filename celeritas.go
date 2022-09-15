@@ -14,6 +14,8 @@ import (
 
 const version = "1.0.0"
 
+// Celeritas is the overall type for the Celeritas package. Members that are exported in this type
+// are available to any application that uses it.
 type Celeritas struct {
 	AppName  string
 	Debug    bool
@@ -30,10 +32,12 @@ type config struct {
 	renderer string
 }
 
+// New reads the .env file, creates our application config, populates the Celeritas type with settings
+// based on .env values, and creates necessary folders and files if they don't exist
 func (c *Celeritas) New(rootPath string) error {
 	pathConfig := initPaths{
 		rootPath:    rootPath,
-		folderNames: []string{"handlers", "migrations", "views", "data", "public", "tmp", "log", "middleware"},
+		folderNames: []string{"handlers", "migrations", "views", "data", "public", "tmp", "logs", "middleware"},
 	}
 
 	err := c.Init(pathConfig)
@@ -46,7 +50,7 @@ func (c *Celeritas) New(rootPath string) error {
 		return err
 	}
 
-	// Read .env
+	// read .env
 	err = godotenv.Load(rootPath + "/.env")
 	if err != nil {
 		return err
@@ -69,9 +73,11 @@ func (c *Celeritas) New(rootPath string) error {
 	return nil
 }
 
+// Init creates necessary folders for our Celeritas application
 func (c *Celeritas) Init(p initPaths) error {
 	root := p.rootPath
 	for _, path := range p.folderNames {
+		// create folder if it doesn't exist
 		err := c.CreateDirIfNotExist(root + "/" + path)
 		if err != nil {
 			return err
@@ -80,15 +86,17 @@ func (c *Celeritas) Init(p initPaths) error {
 	return nil
 }
 
-// start WebServer
+// ListenAndServe starts the web server
 func (c *Celeritas) ListenAndServe() {
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
 		ErrorLog:     c.ErrorLog,
+		Handler:      c.routes(),
 		IdleTimeout:  30 * time.Second,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 600 * time.Second,
 	}
+
 	c.InfoLog.Printf("Listening on port %s", os.Getenv("PORT"))
 	err := srv.ListenAndServe()
 	c.ErrorLog.Fatal(err)
@@ -106,8 +114,8 @@ func (c *Celeritas) startLoggers() (*log.Logger, *log.Logger) {
 	var infoLog *log.Logger
 	var errorLog *log.Logger
 
-	infoLog = log.New(os.Stdout, "INFO    ", log.Ldate|log.Ltime)
-	errorLog = log.New(os.Stdout, "ERROR    ", log.Ldate|log.Ltime|log.Lshortfile)
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	return infoLog, errorLog
 }

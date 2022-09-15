@@ -1,6 +1,6 @@
 package celeritas
 
 type initPaths struct {
-	rootPath    string
+	rootPath string
 	folderNames []string
 }
