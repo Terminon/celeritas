@@ -35,7 +35,7 @@ func (c *Session) InitSession() *scs.SessionManager {
 	}
 
 	// must cookies be secure ?
-	if strings.toLower(c.CookieSecure) == "true" {
+	if strings.ToLower(c.CookieSecure) == "true" {
 		secure = true
 	}
 
@@ -57,6 +57,6 @@ func (c *Session) InitSession() *scs.SessionManager {
 	default:
 		// cookie
 
-		return session
 	}
+	return session
 }
