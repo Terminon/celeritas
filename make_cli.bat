@@ -1,0 +1,1 @@
+go build -o ../myapp/celeritas.exe ./cmd/cli
