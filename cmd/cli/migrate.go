@@ -1,7 +1,11 @@
 package main
 
+import "fmt"
+
 func doMigrate(arg2, arg3 string) error {
 	dsn := getDSN()
+
+	fmt.Println("doMigrate with dsn:", dsn)
 
 	// run the migration command
 	switch arg2 {

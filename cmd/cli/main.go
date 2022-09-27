@@ -74,13 +74,6 @@ func validateInput() (string, string, string, error) {
 	return arg1, arg2, arg3, nil
 }
 
-func showHelp() {
-	color.Yellow(`Available commands:
-	help		- show the help commands
-	version		- print application version
-`)
-}
-
 func exitGracefully(err error, msg ...string) {
 	message := ""
 	if len(msg) > 0 {
