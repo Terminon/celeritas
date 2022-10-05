@@ -19,5 +19,5 @@ var testRenderer = Render{
 }
 
 func TestMain(m *testing.M) {
-	os.Exit(m.Run()) // Before exiting, run m.Run()
+	os.Exit(m.Run())
 }

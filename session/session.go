@@ -11,30 +11,28 @@ import (
 
 type Session struct {
 	CookieLifetime string
-	CookiePersist  string
+	CookiePersist   string
 	CookieName     string
 	CookieDomain   string
 	SessionType    string
-	CookieSecure   string
+	CookieSecure string
 }
 
 func (c *Session) InitSession() *scs.SessionManager {
 	var persist, secure bool
 
-	// how long should sessions last ?
+	// how long should sessions last?
 	minutes, err := strconv.Atoi(c.CookieLifetime)
 	if err != nil {
 		minutes = 60
 	}
 
-	// should cookies persist ?
+	// should cookies persist?
 	if strings.ToLower(c.CookiePersist) == "true" {
 		persist = true
-	} else {
-		persist = false
 	}
 
-	// must cookies be secure ?
+	// must cookies be secure?
 	if strings.ToLower(c.CookieSecure) == "true" {
 		secure = true
 	}
@@ -48,15 +46,17 @@ func (c *Session) InitSession() *scs.SessionManager {
 	session.Cookie.Domain = c.CookieDomain
 	session.Cookie.SameSite = http.SameSiteLaxMode
 
-	// Which session store?
+	// which session store?
 	switch strings.ToLower(c.SessionType) {
 	case "redis":
+
 	case "mysql", "mariadb":
+
 	case "postgres", "postgresql":
 
 	default:
 		// cookie
-
 	}
+
 	return session
 }

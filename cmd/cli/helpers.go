@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
-	"os"
 )
 
 func setup() {
@@ -22,8 +23,6 @@ func setup() {
 	cel.DB.DataType = os.Getenv("DATABASE_TYPE")
 }
 
-// unfortunately, the migration package needs a different dsn format than used in the main Celeritas package.
-// Therefore, we convert it here.
 func getDSN() string {
 	dbType := cel.DB.DataType
 
@@ -49,18 +48,20 @@ func getDSN() string {
 				os.Getenv("DATABASE_NAME"),
 				os.Getenv("DATABASE_SSL_MODE"))
 		}
-		fmt.Println("Returning dsn: ", dsn)
 		return dsn
 	}
 	return "mysql://" + cel.BuildDSN()
 }
+
 func showHelp() {
 	color.Yellow(`Available commands:
-    help                  - show the help commands
-    version               - print application version
-    migrate               - runs all up migrations that have not been run previously
-    migrate down          - reverses the most recent migration
-    migrate reset         - runs all down migrations in reverse order, and then all up migrations
-    make migration <name> - creates two new up and down migrations in the migrations folder 
-`)
+
+	help                  - show the help commands
+	version               - print application version
+	migrate               - runs all up migrations that have not been run previously
+	migrate down          - reverses the most recent migration
+	migrate reset         - runs all down migrations in reverse order, and then all up migrations
+	make migration <name> - creates two new up and down migrations in the migrations folder
+	
+	`)
 }

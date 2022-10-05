@@ -1,11 +1,7 @@
 package main
 
-import "fmt"
-
 func doMigrate(arg2, arg3 string) error {
 	dsn := getDSN()
-
-	fmt.Println("doMigrate with dsn:", dsn)
 
 	// run the migration command
 	switch arg2 {
@@ -14,6 +10,7 @@ func doMigrate(arg2, arg3 string) error {
 		if err != nil {
 			return err
 		}
+
 	case "down":
 		if arg3 == "all" {
 			err := cel.MigrateDownAll(dsn)
@@ -28,15 +25,16 @@ func doMigrate(arg2, arg3 string) error {
 		}
 	case "reset":
 		err := cel.MigrateDownAll(dsn)
-		if err != nil {
-			return err
-		}
-		cel.MigrateUp(dsn)
+			if err != nil {
+				return err
+			}
+		err = cel.MigrateUp(dsn)
 		if err != nil {
 			return err
 		}
 	default:
 		showHelp()
 	}
+
 	return nil
 }

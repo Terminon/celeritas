@@ -1,10 +1,9 @@
 package celeritas
 
 import (
-	"fmt"
-	"github.com/golang-migrate/migrate/v4"
 	"log"
-	"path/filepath"
+
+	"github.com/golang-migrate/migrate/v4"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/golang-migrate/migrate/v4/database/mysql"
@@ -13,15 +12,13 @@ import (
 )
 
 func (c *Celeritas) MigrateUp(dsn string) error {
-	rootPath := filepath.ToSlash(c.RootPath) // Windows specific fix
-	m, err := migrate.New("file://"+rootPath+"/migrations", dsn)
-	fmt.Println("dsn:", dsn)
+	m, err := migrate.New("file://" + c.RootPath + "/migrations", dsn)
 	if err != nil {
 		return err
 	}
 	defer m.Close()
 
-	if err = m.Up(); err != nil {
+	if err := m.Up(); err != nil {
 		log.Println("Error running migration:", err)
 		return err
 	}
@@ -29,43 +26,43 @@ func (c *Celeritas) MigrateUp(dsn string) error {
 }
 
 func (c *Celeritas) MigrateDownAll(dsn string) error {
-	rootPath := filepath.ToSlash(c.RootPath) // Windows specific fix
-	m, err := migrate.New("file://"+rootPath+"/migrations", dsn)
+	m, err := migrate.New("file://" + c.RootPath + "/migrations", dsn)
 	if err != nil {
 		return err
 	}
 	defer m.Close()
 
-	if err = m.Down(); err != nil {
+	if err := m.Down(); err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (c *Celeritas) Steps(n int, dsn string) error {
-	rootPath := filepath.ToSlash(c.RootPath) // Windows specific fix
-	m, err := migrate.New("file://"+rootPath+"/migrations", dsn)
+	m, err := migrate.New("file://" + c.RootPath + "/migrations", dsn)
 	if err != nil {
 		return err
 	}
 	defer m.Close()
 
-	if err = m.Steps(n); err != nil {
+	if err := m.Steps(n); err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (c *Celeritas) MigrateForce(dsn string) error {
-	rootPath := filepath.ToSlash(c.RootPath) // Windows specific fix
-	m, err := migrate.New("file://"+rootPath+"/migrations", dsn)
+	m, err := migrate.New("file://" + c.RootPath + "/migrations", dsn)
 	if err != nil {
 		return err
 	}
 	defer m.Close()
 
-	if err = m.Force(-1); err != nil {
+	if err := m.Force(-1); err != nil {
 		return err
 	}
+
 	return nil
 }

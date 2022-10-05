@@ -76,16 +76,16 @@ func (c *Render) GoPage(w http.ResponseWriter, r *http.Request, view string, dat
 	return nil
 }
 
-// JetPage renders a template using the Jet template engine
+// JetPage renders a template using the Jet templating engine
 func (c *Render) JetPage(w http.ResponseWriter, r *http.Request, templateName string, variables, data interface{}) error {
 	var vars jet.VarMap
 
 	if variables == nil {
 		vars = make(jet.VarMap)
-
 	} else {
 		vars = variables.(jet.VarMap)
 	}
+
 	td := &TemplateData{}
 	if data != nil {
 		td = data.(*TemplateData)
@@ -98,6 +98,7 @@ func (c *Render) JetPage(w http.ResponseWriter, r *http.Request, templateName st
 		log.Println(err)
 		return err
 	}
+
 	if err = t.Execute(w, vars, td); err != nil {
 		log.Println(err)
 		return err

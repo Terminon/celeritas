@@ -1,13 +1,6 @@
-SHELL=cmd.exe
-
-test:
-	echo Testing...
-	go test ./...
-	echo Done!
-
 ## test: runs all tests
 test:
-	go test -v ./...
+	@go test -v ./...
 
 ## cover: opens coverage in browser
 cover:
