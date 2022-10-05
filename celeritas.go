@@ -12,8 +12,8 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
-	"github.com/tsawler/celeritas/render"
-	"github.com/tsawler/celeritas/session"
+	"github.com/Terminon/celeritas/render"
+	"github.com/Terminon/celeritas/session"
 )
 
 const version = "1.0.0"
