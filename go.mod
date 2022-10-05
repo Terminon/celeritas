@@ -1,4 +1,4 @@
-module github.com/Terminon/celeritas
+module github.com/tsawler/celeritas
 
 go 1.17
 
