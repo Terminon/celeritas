@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"time"
 )
 
@@ -12,7 +13,7 @@ func doAuth() error {
 	upFile := cel.RootPath + "/migrations/" + fileName + ".up.sql"
 	downFile := cel.RootPath + "/migrations/" + fileName + ".down.sql"
 
-	err := copyFilefromTemplate("templates/migrations/auth_tables." + dbType + ".sql", upFile)
+	err := copyFilefromTemplate("templates/migrations/auth_tables."+dbType+".sql", upFile)
 	if err != nil {
 		exitGracefully(err)
 	}
@@ -28,26 +29,32 @@ func doAuth() error {
 		exitGracefully(err)
 	}
 
-	err = copyFilefromTemplate("templates/data/user.go.txt", cel.RootPath + "/data/user.go")
+	err = copyFilefromTemplate("templates/data/user.go.txt", cel.RootPath+"/data/user.go")
 	if err != nil {
 		exitGracefully(err)
 	}
 
-	err = copyFilefromTemplate("templates/data/token.go.txt", cel.RootPath + "/data/token.go")
+	err = copyFilefromTemplate("templates/data/token.go.txt", cel.RootPath+"/data/token.go")
 	if err != nil {
 		exitGracefully(err)
 	}
 
 	// copy over middleware
-	err = copyFilefromTemplate("templates/middleware/auth.go.txt", cel.RootPath + "/middleware/auth.go")
+	err = copyFilefromTemplate("templates/middleware/auth.go.txt", cel.RootPath+"/middleware/auth.go")
 	if err != nil {
 		exitGracefully(err)
 	}
 
-	err = copyFilefromTemplate("templates/middleware/auth-token.go.txt", cel.RootPath + "/middleware/auth-token.go")
+	err = copyFilefromTemplate("templates/middleware/auth-token.go.txt", cel.RootPath+"/middleware/auth-token.go")
 	if err != nil {
 		exitGracefully(err)
 	}
+
+	color.Yellow("  - users, tokens, and remember_tokens migrations created and executed")
+	color.Yellow("  - user and tokens models created")
+	color.Yellow("  - auth middleware created")
+	color.Yellow("")
+	color.Yellow("Dont forget to add user and token models in data/modles.go and to add appropriate middleware to your routes!")
 
 	return nil
 }
