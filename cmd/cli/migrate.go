@@ -25,9 +25,9 @@ func doMigrate(arg2, arg3 string) error {
 		}
 	case "reset":
 		err := cel.MigrateDownAll(dsn)
-			if err != nil {
-				return err
-			}
+		if err != nil {
+			return err
+		}
 		err = cel.MigrateUp(dsn)
 		if err != nil {
 			return err

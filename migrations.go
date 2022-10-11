@@ -12,7 +12,7 @@ import (
 )
 
 func (c *Celeritas) MigrateUp(dsn string) error {
-	m, err := migrate.New("file://" + c.RootPath + "/migrations", dsn)
+	m, err := migrate.New("file://"+c.RootPath+"/migrations", dsn)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (c *Celeritas) MigrateUp(dsn string) error {
 }
 
 func (c *Celeritas) MigrateDownAll(dsn string) error {
-	m, err := migrate.New("file://" + c.RootPath + "/migrations", dsn)
+	m, err := migrate.New("file://"+c.RootPath+"/migrations", dsn)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func (c *Celeritas) MigrateDownAll(dsn string) error {
 }
 
 func (c *Celeritas) Steps(n int, dsn string) error {
-	m, err := migrate.New("file://" + c.RootPath + "/migrations", dsn)
+	m, err := migrate.New("file://"+c.RootPath+"/migrations", dsn)
 	if err != nil {
 		return err
 	}
@@ -54,7 +54,7 @@ func (c *Celeritas) Steps(n int, dsn string) error {
 }
 
 func (c *Celeritas) MigrateForce(dsn string) error {
-	m, err := migrate.New("file://" + c.RootPath + "/migrations", dsn)
+	m, err := migrate.New("file://"+c.RootPath+"/migrations", dsn)
 	if err != nil {
 		return err
 	}

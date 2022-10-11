@@ -12,10 +12,10 @@ func TestSession_InitSession(t *testing.T) {
 
 	c := &Session{
 		CookieLifetime: "100",
-		CookiePersist: "true",
-		CookieName: "celeritas",
-		CookieDomain: "localhost",
-		SessionType: "cookie",
+		CookiePersist:  "true",
+		CookieName:     "celeritas",
+		CookieDomain:   "localhost",
+		SessionType:    "cookie",
 	}
 
 	var sm *scs.SessionManager

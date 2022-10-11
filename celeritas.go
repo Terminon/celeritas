@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/CloudyKit/jet/v6"
+	"github.com/Terminon/celeritas/render"
+	"github.com/Terminon/celeritas/session"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
-	"github.com/Terminon/celeritas/render"
-	"github.com/Terminon/celeritas/session"
 )
 
 const version = "1.0.0"
@@ -115,6 +115,7 @@ func (c *Celeritas) New(rootPath string) error {
 		CookieName:     c.config.cookie.name,
 		SessionType:    c.config.sessionType,
 		CookieDomain:   c.config.cookie.domain,
+		DBPool:         c.DB.Pool,
 	}
 
 	c.Session = sess.InitSession()
