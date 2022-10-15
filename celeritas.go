@@ -2,6 +2,8 @@ package celeritas
 
 import (
 	"fmt"
+	"github.com/Terminon/celeritas/cache"
+	"github.com/gomodule/redigo/redis"
 	"log"
 	"net/http"
 	"os"
@@ -34,6 +36,7 @@ type Celeritas struct {
 	JetViews      *jet.Set
 	config        config
 	EncryptionKey string
+	Cache         cache.Cache // Using interface to enable other stores besides Redis
 }
 
 type config struct {
@@ -42,6 +45,7 @@ type config struct {
 	cookie      cookieConfig
 	sessionType string
 	database    databaseConfig
+	redis       RedisConfig
 }
 
 // New reads the .env file, creates our application config, populates the Celeritas type with settings
@@ -84,6 +88,11 @@ func (c *Celeritas) New(rootPath string) error {
 		}
 	}
 
+	if os.Getenv("CACHE") == "redis" {
+		myRedisCache := c.createClientRedisCache()
+		c.Cache = myRedisCache
+	}
+
 	c.InfoLog = infoLog
 	c.ErrorLog = errorLog
 	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
@@ -105,6 +114,11 @@ func (c *Celeritas) New(rootPath string) error {
 		database: databaseConfig{
 			database: os.Getenv("DATABASE_TYPE"),
 			dsn:      c.BuildDSN(),
+		},
+		redis: RedisConfig{
+			host:     os.Getenv("REDIS_HOST"),
+			password: os.Getenv("REDIS_PASSWORD"),
+			prefix:   os.Getenv("REDIS_PREFIX"),
 		},
 	}
 
@@ -194,6 +208,32 @@ func (c *Celeritas) createRenderer() {
 	c.Render = &myRenderer
 }
 
+func (c *Celeritas) createClientRedisCache() *cache.RedisCache {
+	cacheClient := cache.RedisCache{
+		Conn:   c.createRedisPool(),
+		Prefix: c.config.redis.prefix,
+	}
+	return &cacheClient
+}
+
+func (c *Celeritas) createRedisPool() *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     50,
+		MaxActive:   10000,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp",
+				c.config.redis.host,
+				redis.DialPassword(c.config.redis.password))
+		},
+
+		TestOnBorrow: func(conn redis.Conn, t time.Time) error {
+			_, err := conn.Do("PING")
+			return err
+		},
+	}
+}
+
 // BuildDSN builds the datasource name for our database, and returns it as a string
 func (c *Celeritas) BuildDSN() string {
 	var dsn string
@@ -207,7 +247,7 @@ func (c *Celeritas) BuildDSN() string {
 			os.Getenv("DATABASE_NAME"),
 			os.Getenv("DATABASE_SSL_MODE"))
 
-		// we check to see if a database passsword has been supplied, since including "password=" with nothing
+		// we check to see if a database password has been supplied, since including "password=" with nothing
 		// after it sometimes causes postgres to fail to allow a connection.
 		if os.Getenv("DATABASE_PASS") != "" {
 			dsn = fmt.Sprintf("%s password=%s", dsn, os.Getenv("DATABASE_PASS"))
