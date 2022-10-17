@@ -77,6 +77,7 @@ func (c *RedisCache) Get(str string) (interface{}, error) {
 	return item, nil
 }
 func (c *RedisCache) Set(str string, value interface{}, expires ...int) error {
+	fmt.Println("Redis Set triggered")
 	key := fmt.Sprintf("%s:%s", c.Prefix, str)
 	conn := c.Conn.Get()
 	defer conn.Close()
@@ -90,14 +91,19 @@ func (c *RedisCache) Set(str string, value interface{}, expires ...int) error {
 	if len(expires) > 0 {
 		_, err := conn.Do("SETEX", key, expires[0], string(encoded))
 		if err != nil {
+			fmt.Println("Redis Set: Error1")
+			fmt.Println("--->", err)
 			return err
 		}
 	} else {
-		_, err := conn.Do("SETEX", key, string(encoded))
+		_, err := conn.Do("SET", key, string(encoded))
 		if err != nil {
+			fmt.Println("Redis Set: Error2")
+			fmt.Println("--->", err)
 			return err
 		}
 	}
+	fmt.Println("Redis Set: Success")
 	return nil
 }
 func (c *RedisCache) Forget(str string) error {
