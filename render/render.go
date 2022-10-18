@@ -3,6 +3,7 @@ package render
 import (
 	"errors"
 	"fmt"
+	"github.com/justinas/nosurf"
 	"html/template"
 	"log"
 	"net/http"
@@ -37,6 +38,7 @@ type TemplateData struct {
 func (c *Render) defaultData(td *TemplateData, r *http.Request) *TemplateData {
 	td.Secure = c.Secure
 	td.ServerName = c.ServerName
+	td.CSRFToken = nosurf.Token(r)
 	td.Port = c.Port
 	if c.Session.Exists(r.Context(), "userID") {
 		td.IsAuthenticated = true
