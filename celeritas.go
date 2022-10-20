@@ -3,6 +3,7 @@ package celeritas
 import (
 	"fmt"
 	"github.com/Terminon/celeritas/cache"
+	"github.com/Terminon/celeritas/mailer"
 	"github.com/gomodule/redigo/redis"
 	"log"
 	"net/http"
@@ -39,6 +40,8 @@ type Celeritas struct {
 	config        config
 	EncryptionKey string
 	Cache         cache.Cache // Using interface to enable other stores besides Redis
+	// Scheduler seems to be used in Badger section
+	Mail mailer.Mail
 }
 
 type config struct {
@@ -101,6 +104,7 @@ func (c *Celeritas) New(rootPath string) error {
 	c.Version = version
 	c.RootPath = rootPath
 	c.Routes = c.routes().(*chi.Mux)
+	c.Mail = c.createrMailer()
 
 	c.config = config{
 		port:     os.Getenv("PORT"),
@@ -158,6 +162,8 @@ func (c *Celeritas) New(rootPath string) error {
 	}
 
 	c.createRenderer()
+
+	go c.Mail.ListenForMail()
 
 	return nil
 }
@@ -221,7 +227,26 @@ func (c *Celeritas) createRenderer() {
 	}
 	c.Render = &myRenderer
 }
+func (c *Celeritas) createrMailer() mailer.Mail {
+	port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	m := mailer.Mail{
+		Domain:      os.Getenv("MAIL_DOMAIN"),
+		Templates:   c.RootPath + "/mail",
+		Host:        os.Getenv("SMTP_HOST"),
+		Port:        port,
+		Username:    os.Getenv("SMTP_USERNAME"),
+		Password:    os.Getenv("SMTP_PASSWORD"),
+		Encryption:  os.Getenv("SMTP_ENCRYPTION"),
+		FromName:    os.Getenv("FROM_NAME"),
+		FromAddress: os.Getenv("FROM_ADDRESS"),
+		Jobs:        make(chan mailer.Message, 20),
+		Results:     make(chan mailer.Result, 20),
+		API:         os.Getenv("MAILER_API"), // not implemented
+		APIUrl:      os.Getenv("MAILER_URL"), // not implemented
+	}
 
+	return m
+}
 func (c *Celeritas) createClientRedisCache() *cache.RedisCache {
 	cacheClient := cache.RedisCache{
 		Conn:   c.createRedisPool(),
