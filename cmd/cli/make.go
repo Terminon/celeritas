@@ -101,6 +101,23 @@ func doMake(arg2, arg3 string) error {
 			exitGracefully(err)
 		}
 
+	case "mail":
+		if arg3 == "" {
+			exitGracefully(errors.New("You must give the mail template a name"))
+		}
+
+		htmlMail := cel.RootPath + "/mail/" + strings.ToLower(arg3) + ".html.tmpl"
+		plainMail := cel.RootPath + "/mail/" + strings.ToLower(arg3) + ".plain.tmpl"
+
+		err := copyFilefromTemplate("templates/mailer/mail.html.tmpl", htmlMail)
+		if err != nil {
+			exitGracefully(err)
+		}
+		err = copyFilefromTemplate("templates/mailer/mail.plain.tmpl", plainMail)
+		if err != nil {
+			exitGracefully(err)
+		}
+
 	case "session":
 		err := doSessionTable()
 		if err != nil {
