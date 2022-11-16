@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/CloudyKit/jet/v6"
@@ -41,7 +42,15 @@ type Celeritas struct {
 	EncryptionKey string
 	Cache         cache.Cache // Using interface to enable other stores besides Redis
 	// Scheduler seems to be used in Badger section
-	Mail mailer.Mail
+	Mail   mailer.Mail
+	Server Server
+}
+
+type Server struct {
+	ServerName string
+	Port       string
+	Secure     bool
+	URL        string
 }
 
 type config struct {
@@ -128,6 +137,16 @@ func (c *Celeritas) New(rootPath string) error {
 		},
 	}
 
+	secure := true
+	if strings.ToLower(os.Getenv("SECURE")) == "false" {
+		secure = false
+	}
+	c.Server = Server{
+		ServerName: os.Getenv("SERVER_NAME"),
+		Port:       os.Getenv("PORT"),
+		Secure:     secure,
+		URL:        os.Getenv("APP_URL"),
+	}
 	// create session
 
 	sess := session.Session{
