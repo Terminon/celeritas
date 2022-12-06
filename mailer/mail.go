@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
+	"strings"
 	"time"
 
 	"github.com/vanng822/go-premailer/premailer"
@@ -130,7 +131,11 @@ func (m *Mail) getEncryption(e string) mail.Encryption {
 }
 
 func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
+
 	templateToRender := fmt.Sprintf("%s/%s.html.tmpl", m.Templates, msg.Template)
+
+	templateToRender = strings.Replace(templateToRender, "amp;", "", 1)
+
 	t, err := template.New("email-html").ParseFiles(templateToRender)
 	if err != nil {
 		return "", err
@@ -141,9 +146,16 @@ func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 		return "", err
 	}
 
-	formattedMessage := tpl.String()
-	formattedMessage, err = m.inlineCSS(formattedMessage)
+	// ExecuteTemplate seems to create invalid links, as it translates "&" into "&amp;", and
+	// semicolons are not allowed in links; it cuts the link off
 
+	formattedMessage := tpl.String()
+	//fmt.Println("before message1:", formattedMessage)
+	formattedMessage, err = m.inlineCSS(formattedMessage)
+	//fmt.Println("before message2:", formattedMessage)
+
+	formattedMessage = strings.Replace(formattedMessage, "&amp;", "&", -1)
+	//fmt.Println("final message3:", formattedMessage)
 	return formattedMessage, nil
 }
 func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
