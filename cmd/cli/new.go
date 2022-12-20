@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -23,7 +24,7 @@ func doNew(appName string) {
 	// git clone the skeleton application
 	color.Green("\tCloning repository...")
 	_, err := git.PlainClone("./"+appName, false, &git.CloneOptions{
-		URL:      "git@github.com/terminon/celeritas-app.git",
+		URL:      "https://Terminon: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@github.com/Terminon/celeritas-app",
 		Progress: os.Stdout,
 		Depth:    1,
 	})
@@ -32,10 +33,24 @@ func doNew(appName string) {
 	}
 
 	// remove the .git directory
-
+	err = os.RemoveAll(fmt.Sprintf("./%s/.git", appName))
+	if err != nil {
+		exitGracefully(err)
+	}
 	// create a ready to go .env file
+	color.Yellow("\tCreating .env file...")
+	data, err := templateFS.ReadFile("templates/env.txt")
+	if err != nil {
+		exitGracefully(err)
+	}
+	env := string(data)
+	env = strings.ReplaceAll(env, "${APP_NAME}", appName)
+	env = strings.ReplaceAll(env, "${KEY}", cel.RandomString(32))
 
-	// create a makefile
+	err = copyDataToFile([]byte(env), fmt.Sprintf("./%s/.env", appName))
+	if err != nil {
+		exitGracefully(err)
+	}
 
 	// update the go.mod file
 
